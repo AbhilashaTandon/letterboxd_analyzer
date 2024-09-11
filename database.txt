@@ -1,0 +1,43 @@
+database:
+
+https://www.freecodecamp.org/news/postgresql-in-python/
+
+relations:
+
+users: username user_id
+
+movies: movie_name movie_id
+
+liked_movies: user_id movie_id (2 foreign keys, many to many)
+
+CREATE DATABASE letterboxd WITH OWNER postgres;
+
+CREATE TABLE letterboxd.users(
+    id SERIAL,
+    name VARCHAR(128) UNIQUE,
+    PRIMARY KEY(id)
+);
+
+CREATE TABLE letterboxd.movies(
+    id INTEGER UNIQUE,
+    name VARCHAR(128),
+    PRIMARY KEY(id)
+); 
+#dont make key serial here, since we're using letterboxd's ids and not adding movies in their order. also movie names might not be unique
+
+CREATE TABLE letterboxd.liked_movies(
+    movie_id INTEGER REFERENCES letterboxd.movies(id) ON DELETE CASCADE,
+    user_id INTEGER REFERENCES letterboxd.users(id) ON DELETE CASCADE,
+    rating INTEGER,
+    PRIMARY KEY(movie_id, user_id)
+);
+
+SELECT movies.name, users.name, liked_movies.rating FROM letterboxd.liked_movies JOIN letterboxd.users ON users.id = liked_movies.user_id JOIN letterboxd.movies ON movies.id = liked_movies.movie_id ORDER BY users.id, movies.id;
+
+
+def get_user_id(user_name):
+    run this command
+    SELECT users.id FROM users WHERE users.name = {user_name};
+
+def get_movie_occurences(movie_id):
+    SELECT count(*) FROM liked_movies WHERE liked_movies.movie_id = {movie_id}
