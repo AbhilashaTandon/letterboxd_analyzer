@@ -12,17 +12,17 @@ def stars_to_value(rating: str) -> int:  # turns ★★★★½ into 4.5
     return int(value * 2)
 
 
-def get_liked_movies(user: str) -> dict:
+def get_liked_movies(user: str) -> list:
 
-    movie_data = dict()
+    movie_data = list()
     for reviews_page in range(1, 1000):
         page = requests.get(
-            'https://letterboxd.com' + user + 'films/by/entry-rating/page/' + str(reviews_page), timeout=10)
+            'https://letterboxd.com/' + user + '/films/by/entry-rating/page/' + str(reviews_page), timeout=1)
 
-        if (not page):
-            return dict()
+        if (not page):  # if bad http response
+            return movie_data
 
-        soup = BeautifulSoup(page.text)
+        soup = BeautifulSoup(page.text, features="lxml")
 
         movies = soup.find_all('li', class_='poster-container')
 
@@ -34,8 +34,10 @@ def get_liked_movies(user: str) -> dict:
                 user_rating = stars_to_value(
                     rating.text)
 
-                movie_data[user+movie_id] = {'name': movie_name,
-                                             'rating': user_rating, 'id': movie_id, 'reviewer': user}
+                movie_data.append(movie_name + ' ' +
+                                  movie_id + ' ' + user + ' ' + str(user_rating))
+            else:
+                return movie_data  # after first w no review none of the rest will have them
 
     return movie_data
 
@@ -49,12 +51,12 @@ def main():
             users_url = 'https://letterboxd.com/members/popular/this/all-time/page/' + \
                 str(i) + '/'
 
-            users_response = requests.get(users_url, timeout=10)
+            users_response = requests.get(users_url, timeout=1)
 
             if (not users_response):
                 break
 
-            users_soup = BeautifulSoup(users_response.text)
+            users_soup = BeautifulSoup(users_response.text, features="lxml")
 
             users = [user['href']
                      for user in users_soup.find_all('a', class_='avatar')]
@@ -62,9 +64,9 @@ def main():
             print(i, len(users), users[0])
 
             for user in users:
-
-                for movie_id, values in get_liked_movies(user).values():
-                    output_file.write(str(movie_id) + ' ' + ' '.join(values))
+                print(user)
+                for review in get_liked_movies(user.replace('/', '')):
+                    output_file.write(review + '\n')
                 return
 
             all_users.extend(users)
