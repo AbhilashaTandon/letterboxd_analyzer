@@ -10,5 +10,4 @@ class ReviewItem(Item):
     user = Field()
     name = Field()
     movie_id = Field()
-    year = Field()
     rating = Field()
