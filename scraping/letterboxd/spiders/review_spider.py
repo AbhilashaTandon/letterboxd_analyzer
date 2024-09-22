@@ -3,14 +3,14 @@ import scrapy
 from letterboxd.items import ReviewItem
 
 
-def stars_to_value(rating: str) -> int:  # turns ★★★★½ into 4.5
+def stars_to_value(rating: str) -> int:  # turns ★★★★½ into 9
     value = 0
     for char in rating:
         if (char == '★'):
-            value += 1
+            value += 2
         elif (char == '½'):
-            value += .5
-    return int(value * 2)
+            value += 1
+    return value
 
 
 class Review(scrapy.Spider):
@@ -19,7 +19,7 @@ class Review(scrapy.Spider):
     base_url = "https://letterboxd.com"
 
     start_urls = [
-        "https://letterboxd.com/members/popular/page/1/"
+        "https://letterboxd.com/members/popular/page/80/"
     ]
 
     # current_user = ""
@@ -65,6 +65,9 @@ class Review(scrapy.Spider):
             yield request
 
         next_page = response.css('a.next::attr("href")').get()
+
+        print("currently getting users from page %s" % next_page)
+
         if next_page is not None:
             yield response.follow(next_page, callback=self.parse)
 

@@ -7,4 +7,4 @@ FROM (
     ORDER BY Count(reviews.movie_id) DESC LIMIT 6000
 ) 
 movie_count JOIN reviews ON reviews.movie_id = movie_count.movie_id
-ORDER BY movie_count.count_;
+ORDER BY movie_count.count_ DESC;

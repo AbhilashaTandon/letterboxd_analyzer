@@ -62,26 +62,6 @@ class LetterboxdPipeline:
 
         if (not any(map(lambda x: x is None, item.values()))):
 
-            try:
-                self.current.execute("""INSERT INTO movies (id, name) VALUES (%s, %s) ON CONFLICT DO NOTHING;""", (
-                    item["movie_id"],
-                    item["name"],
-                ))
-                self.connection.commit()
-            except psycopg2.errors.InFailedSqlTransaction:
-                self.connection.rollback()
-
-            self.current = self.connection.cursor()
-
-            try:
-                self.current.execute(
-                    "INSERT INTO users (name) VALUES (%s) ON CONFLICT DO NOTHING;", (item["user"],))
-                self.connection.commit()
-            except psycopg2.errors.InFailedSqlTransaction:
-                self.connection.rollback()
-
-            self.current = self.connection.cursor()
-
             self.current.execute(
                 "SELECT * FROM users WHERE name = %s;", (item["user"],))
 
@@ -101,9 +81,29 @@ class LetterboxdPipeline:
                 except psycopg2.errors.UniqueViolation:
                     print("Tried to insert duplicate review",
                           item["name"], item["user"], item["rating"])
-                    return
+                    return item
             else:
                 raise RuntimeError("tried to insert with user_id 0")
+
+            try:
+                self.current.execute("""INSERT INTO movies (id, name) VALUES (%s, %s) ON CONFLICT DO NOTHING;""", (
+                    item["movie_id"],
+                    item["name"],
+                ))
+                self.connection.commit()
+            except psycopg2.errors.InFailedSqlTransaction:
+                self.connection.rollback()
+
+            self.current = self.connection.cursor()
+
+            try:
+                self.current.execute(
+                    "INSERT INTO users (name) VALUES (%s) ON CONFLICT DO NOTHING;", (item["user"],))
+                self.connection.commit()
+            except psycopg2.errors.InFailedSqlTransaction:
+                self.connection.rollback()
+
+            self.current = self.connection.cursor()
 
             self.connection.commit()
 
