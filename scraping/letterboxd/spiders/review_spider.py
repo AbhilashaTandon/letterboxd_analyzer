@@ -66,7 +66,8 @@ class Review(scrapy.Spider):
 
         next_page = response.css('a.next::attr("href")').get()
 
-        print("currently getting users from page %s" % next_page)
+        with open("../log.txt", mode='a') as log_file:
+            log_file.write("currently getting users from page %s" % next_page)
 
         if next_page is not None:
             yield response.follow(next_page, callback=self.parse)

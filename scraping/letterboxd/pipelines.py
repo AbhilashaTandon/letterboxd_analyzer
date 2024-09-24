@@ -57,33 +57,10 @@ class LetterboxdPipeline:
         # self.current.execute("""TRUNCATE users, movies, reviews;""")
 
     def process_item(self, item, spider):
-        with open("../log.txt", mode='a') as log_file:
-            log_file.write("SQL FETCH %s" % item)
+        # with open("../log.txt", mode='a') as log_file:
+        #     log_file.write("SQL FETCH %s" % item)
 
         if (not any(map(lambda x: x is None, item.values()))):
-
-            self.current.execute(
-                "SELECT * FROM users WHERE name = %s;", (item["user"],))
-
-            result = self.current.fetchone()
-
-            user_id = 0  # placeholder
-
-            if (result is None):
-                raise RuntimeError("error adding user to users table")
-            else:
-                user_id = result[0]
-
-            if (user_id != 0):
-                try:
-                    self.current.execute("INSERT INTO reviews (movie_id, user_id, rating) VALUES (%s, %s, %s)",
-                                         (item["movie_id"], user_id, item["rating"]))
-                except psycopg2.errors.UniqueViolation:
-                    print("Tried to insert duplicate review",
-                          item["name"], item["user"], item["rating"])
-                    return item
-            else:
-                raise RuntimeError("tried to insert with user_id 0")
 
             try:
                 self.current.execute("""INSERT INTO movies (id, name) VALUES (%s, %s) ON CONFLICT DO NOTHING;""", (
@@ -104,6 +81,29 @@ class LetterboxdPipeline:
                 self.connection.rollback()
 
             self.current = self.connection.cursor()
+
+            self.current.execute(
+                "SELECT * FROM users WHERE name = %s;", (item["user"],))
+
+            result = self.current.fetchone()
+
+            user_id = 0  # placeholder
+
+            if (result is None):
+                raise RuntimeError("error adding user to users table")
+            else:
+                user_id = result[0]
+
+            if (user_id != 0):
+                try:
+                    self.current.execute("INSERT INTO reviews (movie_id, user_id, rating) VALUES (%s, %s, %s)",
+                                         (item["movie_id"], user_id, item["rating"]))
+                except psycopg2.errors.UniqueViolation:
+                    print("Tried to insert duplicate review",
+                          item["name"], item["user"], item["rating"])
+                    return
+            else:
+                raise RuntimeError("tried to insert with user_id 0")
 
             self.connection.commit()
 
