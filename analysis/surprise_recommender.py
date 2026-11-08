@@ -1,18 +1,25 @@
-from surprise import Dataset, NormalPredictor, Reader
-import numpy as np
-import pandas as pd
 import re
-from collections import defaultdict
 
-from surprise import Dataset, SVD
+import pandas as pd
+from surprise import (
+    NMF,
+    SVD,
+    Dataset,
+    KNNBasic,
+    KNNWithMeans,
+    KNNWithZScore,
+    Reader,
+    SVDpp,
+)
+from surprise.model_selection import cross_validate
 
 
 def look_up_movie(movie_name, unique_movies):
     match_string = re.compile(".*" + movie_name + ".*")
-    for idx, (movie_id, movie_name) in enumerate(unique_movies):
+    for idx, (movie_id, unique_movie_name) in enumerate(unique_movies):
         # movie_name = movie_id_to_name[movie_id]
-        if (re.match(match_string, movie_name)):
-            yield (movie_name, movie_id, idx)
+        if (re.match(match_string, unique_movie_name)):
+            yield (unique_movie_name, movie_id, idx)
 
 
 def get_predictions(my_ratings, data, num_users, movie_names, movie_name_to_idx, algo):
@@ -75,49 +82,49 @@ def main():
 
     print(data.head(10))
 
-    unique_movies = sorted(list(set(zip(data['movie_id'], data['name']))))
+    unique_movies = sorted(set(zip(data['movie_id'], data['name'])))
 
-    unique_users = sorted(list(set(data['user_id'])))
+    unique_users = sorted(set(data['user_id']))
 
     num_movies = len(unique_movies)
     num_users = len(unique_users)
 
-    print("%d Unique Movies" % num_movies)
-    print("%d Unique Users" % num_users)
+    print(f"{num_movies} Unique Movies")
+    print(f"{num_users} Unique Users")
 
-    movie_id_to_idx = {movie_id: idx for idx,
-                       (movie_id, _) in enumerate(unique_movies)}
-    user_id_to_idx = {user_id: idx for idx, user_id in enumerate(unique_users)}
+    # movie_id_to_idx = {movie_id: idx for idx,
+    #                    (movie_id, _) in enumerate(unique_movies)}
+    # user_id_to_idx = {user_id: idx for idx, user_id in enumerate(unique_users)}
 
-    movie_name_to_idx = {movie_name: idx for idx,
-                         (_, movie_name) in enumerate(unique_movies)}
+    # movie_name_to_idx = {movie_name: idx for idx,
+    #                      (_, movie_name) in enumerate(unique_movies)}
 
-    movie_names = [movie_name for (_, movie_name) in unique_movies]
+    # movie_names = [movie_name for (_, movie_name) in unique_movies]
 
-    movie_id_to_name = {movie_id: movie_name for (
-        movie_id, movie_name) in unique_movies}
+    # movie_id_to_name = {movie_id: movie_name for (
+    #     movie_id, movie_name) in unique_movies}
 
-    movie_name_to_idx = {
-        movie_id_to_name[movie_id]: idx for idx, (movie_id, _) in enumerate(unique_movies)}
+    # movie_name_to_idx = {
+    #     movie_id_to_name[movie_id]: idx for idx, (movie_id, _) in enumerate(unique_movies)}
 
-    movie_freqs = {movie_id_to_idx[movie_id]: freq for (
-        movie_id, freq) in zip(data['movie_id'], data['count_'])}
+    # movie_freqs = {movie_id_to_idx[movie_id]: freq for (
+    #     movie_id, freq) in zip(data['movie_id'], data['count_'])}
 
-    from sklearn.model_selection import train_test_split
 
     reader = Reader(rating_scale=(1, 10))
 
     dataset = Dataset.load_from_df(
-        data[["user_id", "movie_id", "rating"]], reader).build_full_trainset()
+        data[["user_id", "movie_id", "rating"]], reader)
+    
+    algo = SVDpp()
 
-    algo = SVD()
 
-    algo.fit(dataset)
+    # algo.fit(dataset)
 
-    predictions = get_predictions({"cars": 10, "cars-2": 10, "cars-3": 10},
-                                  data, num_users, movie_names, movie_name_to_idx, algo)
+    # predictions = get_predictions({"cars": 10},
+    #                               data, num_users, movie_names, movie_name_to_idx, algo)
 
-    print(get_top_n(predictions, num_users))
+    # print(get_top_n(predictions, num_users))
 
 
 if __name__ == "__main__":
