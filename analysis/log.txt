@@ -1,0 +1,46 @@
+5937 Unique Movies
+2516 Unique Users
+
+Evaluating RMSE, MAE of algorithm SVD on 5 split(s).
+
+                  Fold 1  Fold 2  Fold 3  Fold 4  Fold 5  Mean    Std     
+RMSE (testset)    1.5325  1.5279  1.5224  1.5251  1.5241  1.5264  0.0035  
+MAE (testset)     1.1607  1.1599  1.1538  1.1559  1.1536  1.1568  0.0030  
+Fit time          5.93    6.26    6.67    6.64    6.97    6.49    0.36    
+Test time         1.25    1.07    1.34    1.05    1.32    1.20    0.12    
+
+
+Evaluating RMSE, MAE of algorithm KNNBasic on 5 split(s).
+
+                  Fold 1  Fold 2  Fold 3  Fold 4  Fold 5  Mean    Std     
+RMSE (testset)    1.5501  1.5569  1.5465  1.5487  1.5515  1.5507  0.0035  
+MAE (testset)     1.1790  1.1845  1.1778  1.1792  1.1780  1.1797  0.0025  
+Fit time          4.69    5.33    4.72    4.34    5.03    4.82    0.34    
+Test time         29.90   30.21   29.36   28.28   28.02   29.15   0.87 
+
+
+Evaluating RMSE, MAE of algorithm KNNWithMeans on 5 split(s).
+
+                  Fold 1  Fold 2  Fold 3  Fold 4  Fold 5  Mean    Std     
+RMSE (testset)    1.5453  1.5470  1.5432  1.5419  1.5468  1.5449  0.0020  
+MAE (testset)     1.1846  1.1866  1.1859  1.1833  1.1857  1.1852  0.0012  
+Fit time          4.35    5.40    5.04    4.82    4.74    4.87    0.35    
+Test time         28.32   26.60   27.09   27.06   27.75   27.36   0.60    
+
+
+Evaluating RMSE, MAE of algorithm KNNWithZScore on 5 split(s).
+
+                  Fold 1  Fold 2  Fold 3  Fold 4  Fold 5  Mean    Std     
+RMSE (testset)    1.5450  1.5395  1.5415  1.5458  1.5389  1.5421  0.0028  
+MAE (testset)     1.1715  1.1682  1.1687  1.1714  1.1655  1.1691  0.0022  
+Fit time          4.94    4.91    5.22    4.68    5.17    4.98    0.19    
+Test time         28.54   28.82   28.57   28.94   27.85   28.55   0.38  
+
+
+Evaluating RMSE, MAE of algorithm NMF on 5 split(s).
+
+                  Fold 1  Fold 2  Fold 3  Fold 4  Fold 5  Mean    Std     
+RMSE (testset)    1.9204  1.9132  1.9171  1.9258  1.9113  1.9175  0.0052  
+MAE (testset)     1.5947  1.5871  1.5910  1.6009  1.5846  1.5917  0.0058  
+Fit time          12.68   11.34   11.00   11.26   11.13   11.48   0.61    
+Test time         1.19    0.89    1.07    0.95    1.15    1.05    0.11 
